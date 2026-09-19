@@ -27,7 +27,7 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     connectable = create_async_engine(settings.DATABASE_URL, poolclass=pool.NullPool)
 
-    async def do_run_migrations(connection):
+    def do_run_migrations(connection):
         context.configure(
             connection=connection, target_metadata=target_metadata
         )
@@ -35,8 +35,12 @@ def run_migrations_online() -> None:
         with context.begin_transaction():
             context.run_migrations()
 
+    async def run_async_migrations():
+        async with connectable.connect() as connection:
+            await connection.run_sync(do_run_migrations)
+
     import asyncio
-    asyncio.run(connectable.connect().run_sync(do_run_migrations))
+    asyncio.run(run_async_migrations())
 
 if context.is_offline_mode():
     run_migrations_offline()
