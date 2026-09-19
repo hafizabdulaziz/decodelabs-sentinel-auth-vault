@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "sentinel-auth-vault"
+version = "0.1.0"
+description = "Enterprise-Grade Zero Trust Authentication & Autonomous Security Engine"
+authors = ["Abdul Aziz"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
