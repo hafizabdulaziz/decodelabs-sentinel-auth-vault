@@ -3,11 +3,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.db.session import get_db
 from app.models.user import User
+from app.models.token import RefreshToken
 from app.schemas.user import UserCreate, UserRead
 from app.core.security import get_password_hash, verify_password, create_access_token, create_refresh_token
 from app.core.responses import api_response
 from app.core.validators import verify_password_strength
 from app.core.utils import normalize_email
+from datetime import datetime, timedelta, timezone
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -39,6 +42,16 @@ async def login(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     
     access_token = create_access_token(user.email)
     refresh_token = create_refresh_token(user.email)
+    
+    # Store refresh token
+    expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    new_token = RefreshToken(
+        user_id=user.id,
+        token_hash=refresh_token,
+        expires_at=expires_at
+    )
+    db.add(new_token)
+    await db.commit()
     
     return api_response(
         status="success", 
