@@ -40,6 +40,12 @@ async def login(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     if not user or not verify_password(user_in.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
+    # Check MFA
+    mfa_result = await db.execute(select(MFAModel).where(MFAModel.user_id == user.id))
+    mfa = mfa_result.scalars().first()
+    if mfa and mfa.is_enabled:
+        return api_response(status="mfa_required", message="MFA verification required")
+    
     access_token = create_access_token(user.email)
     refresh_token = create_refresh_token(user.email)
     
