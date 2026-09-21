@@ -1,11 +1,4 @@
-from datetime import datetime
-from typing import Any
-from sqlalchemy import DateTime, func
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-
-class Base(DeclarativeBase):
-    pass
-
-class TimestampMixin:
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
+from app.db.base_class import Base
+from app.models.user import User
+from app.models.token import RefreshToken
+from app.models.mfa import MFAModel
