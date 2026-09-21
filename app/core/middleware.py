@@ -1,6 +1,7 @@
 from fastapi import Request, HTTPException, status
 from starlette.middleware.base import BaseHTTPMiddleware
-from app.core.security import verify_token
+from app.services.token_blacklist import is_token_blacklisted
+from app.db.redis import redis_client
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -10,6 +11,12 @@ class AuthMiddleware(BaseHTTPMiddleware):
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Missing or invalid token",
+                )
+            token = auth_header.replace("Bearer ", "")
+            if await is_token_blacklisted(token, redis_client):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token has been revoked",
                 )
         
         response = await call_next(request)
