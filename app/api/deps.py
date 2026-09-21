@@ -1,33 +1,23 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.db.session import get_db
 from app.models.user import User
-from app.core.security import verify_token
-from app.core.config import settings
+from app.models.role import Role
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+class RoleChecker:
+    def __init__(self, allowed_roles: list[str]):
+        self.allowed_roles = allowed_roles
 
-async def get_current_user(
-    db: AsyncSession = Depends(get_db), token: str = Depends(reusable_oauth2)
-) -> User:
-    payload = verify_token(token)
-    if not payload or payload.get("type") != "access":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+    async def __call__(self, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+        result = await db.execute(
+            select(Role).join(user_roles).where(user_roles.c.user_id == current_user.id)
         )
-    
-    email = payload.get("sub")
-    if not email:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-        )
+        user_roles_list = result.scalars().all()
         
-    result = await db.execute(select(User).where(User.email == email))
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+        if not any(role.name in self.allowed_roles for role in user_roles_list):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions"
+            )
+        return current_user
