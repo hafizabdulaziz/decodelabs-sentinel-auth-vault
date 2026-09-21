@@ -11,20 +11,14 @@ from app.core.responses import api_response
 
 router = APIRouter()
 
-@router.post("/setup")
-async def setup_mfa(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
-    secret = pyotp.random_base32()
+@router.post("/verify")
+async def verify_mfa(token: str, current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(MFAModel).where(MFAModel.user_id == current_user.id))
+    mfa = result.scalars().first()
     
-    # Store secret in DB
-    mfa = MFAModel(user_id=current_user.id, secret=secret)
-    db.add(mfa)
+    if not mfa or not pyotp.TOTP(mfa.secret).verify(token):
+        raise HTTPException(status_code=400, detail="Invalid token")
+        
+    mfa.is_enabled = True
     await db.commit()
-    
-    # Generate QR Code
-    uri = pyotp.totp.TOTP(secret).provisioning_uri(name=current_user.email, issuer_name="SentinelAuth")
-    img = qrcode.make(uri)
-    buf = io.BytesIO()
-    img.save(buf)
-    qr_b64 = base64.b64encode(buf.getvalue()).decode()
-    
-    return api_response(status="success", data={"qr_code_b64": qr_b64, "secret": secret})
+    return api_response(status="success", message="MFA verified and enabled")
