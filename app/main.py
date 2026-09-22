@@ -6,14 +6,29 @@ from app.core.security_headers import SecurityHeadersMiddleware
 from app.api.v1.endpoints import auth, users, auth_refresh, health, metrics, mfa, admin, agent, audit
 
 app = FastAPI(
-    title="Sentinel Auth Vault",
-    version="0.1.0",
-    description="Enterprise-Grade Zero Trust Authentication & Autonomous Security Engine",
+    title="Sentinel Auth Vault API",
+    version="1.0.0",
+    description="""
+# Sentinel Auth Vault API
+
+Enterprise-Grade Zero Trust Authentication & Autonomous Security Engine.
+
+## Features
+- **Security:** Argon2id hashing, JWT, MFA.
+- **Access Control:** RBAC & Fine-grained permissions.
+- **Monitoring:** Observability, Audit Logs, IDS.
+- **Operations:** Sliding-window Rate Limiting & Account Lockout.
+""",
+    contact={
+        "name": "Sentinel Auth Vault Team",
+        "url": "https://github.com/your-repo/sentinel-auth-vault",
+    },
 )
 
+# ... (Middleware and Routers remain unchanged) ...
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Configure dynamically based on settings
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,16 +46,13 @@ app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 app.include_router(agent.router, prefix="/api/v1/agent", tags=["agent"])
 app.include_router(audit.router, prefix="/api/v1/audit", tags=["audit"])
 
-# ... custom_openapi and scalar_html unchanged ...
-
-# ... custom_openapi and scalar_html unchanged ...
-
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
         title="Sentinel Auth Vault API",
-        version="0.1.0",
+        version="1.0.0",
+        description="Official API Documentation for Sentinel Auth Vault.",
         routes=app.routes,
     )
     openapi_schema["components"]["securitySchemes"] = {
@@ -60,4 +72,5 @@ async def scalar_html():
     return get_scalar_api_reference(
         openapi_url=app.openapi_url,
         title="Sentinel Auth Vault API",
+        servers=[{"url": "http://localhost:8000"}],
     )
