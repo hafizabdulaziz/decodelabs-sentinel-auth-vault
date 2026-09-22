@@ -1,9 +1,10 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.db.session import get_db
 from app.models.user import User
 from app.models.role import Role
+from app.services.rate_limiter import RateLimiter
 
 class RoleChecker:
     def __init__(self, allowed_roles: list[str]):
@@ -21,3 +22,17 @@ class RoleChecker:
                 detail="Not enough permissions"
             )
         return current_user
+
+class RateLimitChecker:
+    def __init__(self, limit: int, window: int):
+        self.limit = limit
+        self.window = window
+        self.limiter = RateLimiter()
+
+    async def __call__(self, request: Request):
+        client_ip = request.client.host
+        if not await self.limiter.is_allowed(f"rate_limit:{client_ip}", self.limit, self.window):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Too many requests"
+            )
