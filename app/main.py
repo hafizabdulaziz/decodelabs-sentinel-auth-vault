@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from scalar_fastapi import get_scalar_api_reference
-from app.api.v1.endpoints import auth, users, auth_refresh
+from app.api.v1.endpoints import auth, users, auth_refresh, health, metrics
 
 app = FastAPI(
     title="Sentinel Auth Vault",
@@ -12,6 +12,10 @@ app = FastAPI(
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["users"])
 app.include_router(auth_refresh.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(health.router, prefix="/api/v1", tags=["health"])
+app.include_router(metrics.router, prefix="/api/v1", tags=["metrics"])
+
+# ... custom_openapi and scalar_html unchanged ...
 
 def custom_openapi():
     if app.openapi_schema:
