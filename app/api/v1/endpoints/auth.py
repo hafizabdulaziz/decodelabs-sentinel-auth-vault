@@ -4,6 +4,7 @@ from sqlalchemy.future import select
 from app.db.session import get_db
 from app.models.user import User
 from app.models.token import RefreshToken
+from app.models.mfa import MFAModel
 from app.schemas.user import UserCreate, UserRead
 from app.core.security import get_password_hash, verify_password, create_access_token, create_refresh_token
 from app.core.responses import api_response
@@ -11,10 +12,11 @@ from app.core.validators import verify_password_strength
 from app.core.utils import normalize_email
 from datetime import datetime, timedelta, timezone
 from app.core.config import settings
+from app.api.deps import RateLimitChecker
 
 router = APIRouter()
 
-@router.post("/register", status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED, dependencies=[Depends(RateLimitChecker(limit=5, window=60))])
 async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     verify_password_strength(user_in.password)
     email = normalize_email(user_in.email)
@@ -31,7 +33,7 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     await db.commit()
     return api_response(status="success", message="User registered successfully")
 
-@router.post("/login")
+@router.post("/login", dependencies=[Depends(RateLimitChecker(limit=5, window=60))])
 async def login(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     email = normalize_email(user_in.email)
     result = await db.execute(select(User).where(User.email == email))
