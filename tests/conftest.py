@@ -11,8 +11,10 @@ from app.api.deps import get_db
 from app.core.security import get_password_hash
 from app.models.user import User
 
-# Set env var before importing app to override the DB URL
+# Set env var before importing app to override settings
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+os.environ["REDIS_URL"] = "redis://localhost:6379/0"
+os.environ["SECRET_KEY"] = "testsecretkeytestsecretkeytestsecretkey"
 
 from app.main import app
 
