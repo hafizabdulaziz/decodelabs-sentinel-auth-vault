@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+
 import pyotp
-import qrcode
-import io
-import base64
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.api.deps import get_current_user, get_db
-from app.models.user import User
-from app.models.mfa import MFAModel
 from app.core.responses import api_response
+from app.models.mfa import MFAModel
+from app.models.user import User
 
 router = APIRouter()
 

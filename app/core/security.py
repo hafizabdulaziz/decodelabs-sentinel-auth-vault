@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional
+from typing import Any
+
 from jose import jwt
 from passlib.context import CryptContext
+
 from app.core.config import settings
 
 # OWASP Argon2id Configuration
@@ -20,7 +22,7 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 # JWT Engine
-def create_token(data: Dict[str, Any], expires_delta: timedelta, token_type: str) -> str:
+def create_token(data: dict[str, Any], expires_delta: timedelta, token_type: str) -> str:
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode.update({"exp": expire, "type": token_type})
@@ -33,7 +35,7 @@ def create_access_token(subject: str) -> str:
 def create_refresh_token(subject: str) -> str:
     return create_token({"sub": subject}, timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS), "refresh")
 
-def verify_token(token: str) -> Optional[Dict[str, Any]]:
+def verify_token(token: str) -> dict[str, Any] | None:
     try:
         decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return decoded_token

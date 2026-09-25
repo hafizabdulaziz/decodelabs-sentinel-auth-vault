@@ -1,5 +1,6 @@
 from app.services.agent.base import BaseSecurityAgent
 
+
 class SentinelAgent(BaseSecurityAgent):
     async def run_command(self, command: str) -> str:
         # Simple command parsing

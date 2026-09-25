@@ -1,10 +1,11 @@
-import pytest
-from app.models.user import User
-from app.models.role import Role
-from app.models.mfa import MFAModel
-from app.models.audit import AuditLog
 import uuid
 from datetime import datetime, timezone
+
+from app.models.audit import AuditLog
+from app.models.mfa import MFAModel
+from app.models.role import Role
+from app.models.user import User
+
 
 def test_user_model():
     now = datetime.now(timezone.utc)

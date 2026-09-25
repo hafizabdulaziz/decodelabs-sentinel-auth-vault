@@ -1,5 +1,7 @@
 import re
+
 from fastapi import HTTPException, status
+
 
 def validate_password_complexity(password: str) -> bool:
     if len(password) < 8:

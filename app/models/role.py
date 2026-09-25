@@ -1,6 +1,8 @@
 from uuid import UUID, uuid4
-from sqlalchemy import String, ForeignKey, Table, Column
+
+from sqlalchemy import Column, ForeignKey, String, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.base_class import Base, TimestampMixin
 
 # Association table for User-Role

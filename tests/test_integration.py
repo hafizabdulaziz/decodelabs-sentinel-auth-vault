@@ -1,6 +1,6 @@
 import pytest
-from httpx import AsyncClient, ASGITransport
-from app.main import app
+from httpx import AsyncClient
+
 
 @pytest.mark.asyncio
 async def test_auth_flow_e2e(client: AsyncClient):

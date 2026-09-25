@@ -11,11 +11,14 @@ fastapi = "^0.115.0"
 uvicorn = "^0.30.0"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.35"}
 alembic = "^1.13.3"
-asyncpg = "^0.29.0"
+asyncpg = "^0.30.0"
 pydantic-settings = "^2.5.2"
 passlib = {extras = ["argon2"], version = "^1.7.4"}
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 redis = "^5.1.0"
+
+[tool.ruff.lint]
+ignore = ["B008", "DTZ005", "SIM103", "RUF013", "B017"]
 
 [build-system]
 requires = ["poetry-core"]

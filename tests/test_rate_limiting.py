@@ -1,7 +1,8 @@
+from unittest.mock import patch
+
 import pytest
-from httpx import AsyncClient, ASGITransport
-from app.main import app
-from unittest.mock import AsyncMock, patch
+from httpx import AsyncClient
+
 
 @pytest.mark.asyncio
 async def test_rate_limiting_exceeded(client: AsyncClient):

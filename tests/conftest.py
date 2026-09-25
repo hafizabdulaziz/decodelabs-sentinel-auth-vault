@@ -1,18 +1,21 @@
+import os
+import uuid
+from datetime import datetime, timezone
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 import pytest_asyncio
-import os
-from httpx import AsyncClient, ASGITransport
-from unittest.mock import AsyncMock, MagicMock, patch
+from httpx import ASGITransport, AsyncClient
+
 from app.api.deps import get_db
-from app.models.user import User
 from app.core.security import get_password_hash
-from datetime import datetime, timezone
-import uuid
+from app.models.user import User
 
 # Set env var before importing app to override the DB URL
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
 
 from app.main import app
+
 
 @pytest.fixture(autouse=True)
 def mock_rate_limiter():

@@ -1,7 +1,10 @@
 from uuid import UUID, uuid4
-from sqlalchemy import String, ForeignKey, Boolean
+
+from sqlalchemy import Boolean, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.db.base_class import Base, TimestampMixin
+
 
 class MFAModel(Base, TimestampMixin):
     __tablename__ = "mfa"

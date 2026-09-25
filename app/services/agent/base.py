@@ -1,5 +1,6 @@
 import abc
-from typing import List, Any
+from typing import Any
+
 
 class BaseAgentTool(abc.ABC):
     @abc.abstractmethod
@@ -9,7 +10,7 @@ class BaseAgentTool(abc.ABC):
 class BaseSecurityAgent(abc.ABC):
     def __init__(self, name: str):
         self.name = name
-        self.tools: List[BaseAgentTool] = []
+        self.tools: list[BaseAgentTool] = []
 
     def add_tool(self, tool: BaseAgentTool):
         self.tools.append(tool)

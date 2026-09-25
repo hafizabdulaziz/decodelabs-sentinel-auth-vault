@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, Header
+
 from app.api.deps import get_current_user
-from app.services.token_blacklist import blacklist_token
 from app.core.responses import api_response
+from app.services.token_blacklist import blacklist_token
 
 router = APIRouter()
 

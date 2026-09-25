@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
-from app.services.agent.sentinel import SentinelAgent
-from app.services.agent.tools import SecurityAuditorTool
+
 from app.api.deps import RoleChecker
 from app.core.responses import api_response
+from app.services.agent.sentinel import SentinelAgent
+from app.services.agent.tools import SecurityAuditorTool
 
 router = APIRouter()
 agent = SentinelAgent(name="Sentinel")

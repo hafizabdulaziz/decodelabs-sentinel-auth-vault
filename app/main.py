@@ -1,9 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from scalar_fastapi import get_scalar_api_reference
-from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.v1.endpoints import (
+    admin,
+    agent,
+    audit,
+    auth,
+    auth_refresh,
+    health,
+    metrics,
+    mfa,
+    users,
+)
 from app.core.security_headers import SecurityHeadersMiddleware
-from app.api.v1.endpoints import auth, users, auth_refresh, health, metrics, mfa, admin, agent, audit
 
 app = FastAPI(
     title="Sentinel Auth Vault API",

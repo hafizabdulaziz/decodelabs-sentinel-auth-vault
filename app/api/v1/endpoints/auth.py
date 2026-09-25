@@ -1,18 +1,25 @@
+from datetime import datetime, timedelta, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.db.session import get_db
-from app.models.user import User
-from app.models.token import RefreshToken
-from app.models.mfa import MFAModel
-from app.schemas.user import UserCreate, UserRead
-from app.core.security import get_password_hash, verify_password, create_access_token, create_refresh_token
-from app.core.responses import api_response
-from app.core.validators import verify_password_strength
-from app.core.utils import normalize_email
-from datetime import datetime, timedelta, timezone
-from app.core.config import settings
+
 from app.api.deps import RateLimitChecker
+from app.core.config import settings
+from app.core.responses import api_response
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    get_password_hash,
+    verify_password,
+)
+from app.core.utils import normalize_email
+from app.core.validators import verify_password_strength
+from app.db.session import get_db
+from app.models.mfa import MFAModel
+from app.models.token import RefreshToken
+from app.models.user import User
+from app.schemas.user import UserCreate
 
 router = APIRouter()
 

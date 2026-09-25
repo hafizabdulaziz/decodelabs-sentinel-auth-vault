@@ -1,5 +1,7 @@
 import redis.asyncio as redis
+
 from app.db.redis import redis_client
+
 
 class LockoutService:
     def __init__(self, redis: redis.Redis = redis_client):

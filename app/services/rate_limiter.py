@@ -1,6 +1,9 @@
 import time
+
 import redis.asyncio as redis
+
 from app.db.redis import redis_client
+
 
 class RateLimiter:
     def __init__(self, redis: redis.Redis = redis_client):

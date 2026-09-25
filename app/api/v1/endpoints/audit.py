@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.db.session import get_db
-from app.models.audit import AuditLog
+
 from app.api.deps import RoleChecker
 from app.core.responses import api_response
+from app.db.session import get_db
+from app.models.audit import AuditLog
 
 router = APIRouter()
 

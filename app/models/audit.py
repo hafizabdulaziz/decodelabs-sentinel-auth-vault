@@ -1,8 +1,10 @@
 from uuid import UUID, uuid4
-from sqlalchemy import String, DateTime, JSON
+
+from sqlalchemy import JSON, String
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.db.base_class import Base, TimestampMixin
-from datetime import datetime
+
 
 class AuditLog(Base, TimestampMixin):
     __tablename__ = "audit_logs"

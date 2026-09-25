@@ -1,7 +1,10 @@
+from unittest.mock import patch
+
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
+
 from app.main import app
-from unittest.mock import AsyncMock, patch
+
 
 @pytest.mark.asyncio
 async def test_admin_access_forbidden():

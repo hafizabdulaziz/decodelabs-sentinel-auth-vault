@@ -1,7 +1,10 @@
-import pytest
-from httpx import AsyncClient, ASGITransport
-from app.main import app
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+from httpx import ASGITransport, AsyncClient
+
+from app.main import app
+
 
 @pytest.mark.asyncio
 async def test_read_users_me_unauthenticated():
@@ -12,11 +15,12 @@ async def test_read_users_me_unauthenticated():
 
 @pytest.mark.asyncio
 async def test_read_users_me_authenticated():
-    from app.api.deps import get_db, get_current_user
-    from app.models.user import User
-    from app.core.security import create_access_token, get_password_hash
     import uuid
     from datetime import datetime, timezone
+
+    from app.api.deps import get_db
+    from app.core.security import create_access_token, get_password_hash
+    from app.models.user import User
 
     mock_session = AsyncMock()
     now = datetime.now(timezone.utc)

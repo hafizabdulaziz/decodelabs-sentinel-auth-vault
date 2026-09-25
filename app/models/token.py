@@ -1,8 +1,11 @@
-from uuid import UUID, uuid4
-from sqlalchemy import String, DateTime, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
-from app.db.base_class import Base, TimestampMixin
 from datetime import datetime
+from uuid import UUID, uuid4
+
+from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.base_class import Base, TimestampMixin
+
 
 class RefreshToken(Base, TimestampMixin):
     __tablename__ = "refresh_tokens"

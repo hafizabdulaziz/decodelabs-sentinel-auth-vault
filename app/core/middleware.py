@@ -1,7 +1,9 @@
-from fastapi import Request, HTTPException, status
+from fastapi import HTTPException, Request, status
 from starlette.middleware.base import BaseHTTPMiddleware
-from app.services.token_blacklist import is_token_blacklisted
+
 from app.db.redis import redis_client
+from app.services.token_blacklist import is_token_blacklisted
+
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

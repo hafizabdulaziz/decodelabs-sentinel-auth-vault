@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from uuid import UUID
 from datetime import datetime
-from typing import Optional
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -19,9 +20,9 @@ class UserRead(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
 class UserUpdate(BaseModel):
-    email: Optional[EmailStr] = None
-    password: Optional[str] = Field(None, min_length=8)
-    is_active: Optional[bool] = None
+    email: EmailStr | None = None
+    password: str | None = Field(None, min_length=8)
+    is_active: bool | None = None
 
 class PasswordChange(BaseModel):
     current_password: str

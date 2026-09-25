@@ -1,6 +1,8 @@
-from fastapi import Request, HTTPException, status
-from app.services.audit_logger import log_event
+from fastapi import HTTPException, Request, status
+
 from app.db.session import async_session
+from app.services.audit_logger import log_event
+
 
 async def detect_anomalies(request: Request, payload: dict):
     # Basic IDS: Detect suspicious login patterns
