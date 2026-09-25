@@ -113,10 +113,10 @@ async def root():
             <h1>Sentinel Auth Vault</h1>
             <p>Enterprise-Grade Zero Trust Authentication & Autonomous Security Engine. All security services, APIs, metrics, and health diagnostics are unified under this instance.</p>
             <div class="links">
-                <a href="/scalar" target="_blank">📚 API Docs (Scalar)</a>
+                <a href="/docs" target="_blank">📖 Swagger UI (/docs)</a>
+                <a href="/scalar" target="_blank">⚡ Scalar UI (/scalar)</a>
                 <a href="/api/v1/health" target="_blank">🩺 System Health</a>
                 <a href="/api/v1/metrics" target="_blank">📊 Prometheus Metrics</a>
-                <a href="/openapi.json" target="_blank">📄 OpenAPI Spec</a>
             </div>
         </div>
     </body>
