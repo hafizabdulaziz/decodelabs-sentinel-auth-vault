@@ -85,3 +85,16 @@ async def scalar_html():
         title="Sentinel Auth Vault API",
         servers=[{"url": "http://localhost:8000"}],
     )
+
+@app.get("/")
+async def root():
+    return {
+        "status": "success",
+        "message": "Welcome to Sentinel Auth Vault API - Enterprise-Grade Zero Trust Authentication & Autonomous Security Engine",
+        "links": {
+            "docs": "/scalar",
+            "openapi": "/openapi.json",
+            "health": "/api/v1/health",
+            "metrics": "/api/v1/metrics"
+        }
+    }
