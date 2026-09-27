@@ -3,39 +3,71 @@
 Enterprise-Grade Zero Trust Authentication & Autonomous Security Engine.
 
 ## Overview
-Sentinel Auth Vault provides a secure, scalable, and autonomous authentication framework designed for modern enterprise architectures. It integrates advanced security primitives including Multi-Factor Authentication (TOTP), Role-Based Access Control (RBAC), distributed session revocation (Redis), and an autonomous AI security agent.
+Sentinel Auth Vault is an enterprise-grade, zero-trust authentication and autonomous security platform designed for high-assurance microservices and distributed systems. It features advanced cryptographic password hashing (Argon2id), stateless JWT validation, multi-factor authentication (TOTP), sliding-window rate limiting, Redis-backed token revocation, and an autonomous AI security agent.
 
-## Core Features
-- **Security:** Argon2id password hashing, JWT stateless authentication, Security Headers.
-- **MFA:** TOTP support with QR code setup and verification.
-- **RBAC:** Fine-grained role and permission management.
-- **Autonomous IDS:** AI-powered security agent for anomaly detection and audit logging.
-- **Performance:** Asynchronous persistence (SQLAlchemy 2.0 + AsyncPG) and sliding-window rate limiting.
-- **Observability:** Prometheus metrics, Structlog JSON logging, and Health Diagnostics.
-- **CI/CD:** Automated testing, linting (Ruff), and Docker build verification.
+---
 
-## Architecture
-- **API:** FastAPI
-- **Database:** PostgreSQL (Async)
-- **Cache:** Redis
-- **Documentation:** Swagger UI (Interactive OpenAPI)
+## Architecture & Tech Stack
+- **Framework:** FastAPI (High-performance async Python)
+- **Database ORM:** SQLAlchemy 2.0 (AsyncSession) with Alembic migrations
+- **Caching & Revocation:** Redis
+- **Security Primitives:** Argon2id, JWT, TOTP (PyOTP), HTTPBearer
+- **Observability:** Prometheus metrics (`/api/v1/metrics`), Structured JSON logging, Health checks (`/api/v1/health`)
+- **Documentation:** Custom Dark-Mode Enterprise Swagger UI (`/docs`)
+
+---
+
+## API Endpoints Reference
+
+| Endpoint | Method | Description | Auth Required |
+| :--- | :---: | :--- | :---: |
+| `/api/v1/auth/register` | `POST` | Register a new operator account | No |
+| `/api/v1/auth/login` | `POST` | Authenticate and obtain JWT access & refresh tokens | No |
+| `/api/v1/auth/refresh` | `POST` | Refresh expired access tokens | No |
+| `/api/v1/auth/logout` | `POST` | Revoke active session / JWT | Yes (Bearer) |
+| `/api/v1/users/me` | `GET` | Retrieve authenticated operator profile | Yes (Bearer) |
+| `/api/v1/mfa/setup` | `POST` | Generate TOTP secret & QR configuration | Yes (Bearer) |
+| `/api/v1/mfa/verify` | `POST` | Verify TOTP verification code | Yes (Bearer) |
+| `/api/v1/audit/logs` | `GET` | Retrieve immutable security audit event trail | Yes (Admin Role) |
+| `/api/v1/admin/actions` | `POST` | Execute privileged administrative operations | Yes (Admin Role) |
+| `/api/v1/agent/status` | `GET` | Query autonomous security agent health & status | Yes / Optional |
+| `/api/v1/health` | `GET` | System health check (DB, Redis, Core) | No |
+| `/api/v1/metrics` | `GET` | Prometheus operational telemetry metrics | No |
+
+---
 
 ## Installation & Setup
+
 ### Prerequisites
-- Docker & Docker Compose
 - Python 3.13+
+- Docker & Docker Compose (optional for containerized deployment)
 
-### Quick Start
-1. Clone the repository.
-2. Configure `.env` file based on `.env.example`.
-3. Run `docker-compose up -d`.
-4. Access API Docs/UI at `http://localhost:8000/docs`.
+### Local Quick Start (`run.bat`)
+1. Clone the repository and navigate to the project directory.
+2. Set up virtual environment and install dependencies:
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install poetry
+   poetry install
+   ```
+3. Run the application using `run.bat` or directly via uvicorn:
+   ```bash
+   run.bat
+   ```
+4. Open the Enterprise SOC Dashboard and Interactive API Docs at:
+   - **SOC Dashboard & Interface:** [http://localhost:8000/](http://localhost:8000/)
+   - **Swagger UI (Interactive Docs):** [http://localhost:8000/docs](http://localhost:8000/docs)
+   - **Metrics Telemetry:** [http://localhost:8000/api/v1/metrics](http://localhost:8000/api/v1/metrics)
 
-## Documentation
-- **Interactive UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Metrics:** `GET /api/v1/metrics`
-- **Health:** `GET /api/v1/health`
+---
 
-## Development
-- **Tests:** `pytest`
-- **Linting:** `ruff check .`
+## Development & Testing
+- **Run Test Suite:**
+  ```bash
+  .venv\Scripts\python -m pytest
+  ```
+- **Run Linter:**
+  ```bash
+  ruff check .
+  ```
