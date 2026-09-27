@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import HTMLResponse
-from scalar_fastapi import get_scalar_api_reference
 
 from app.api.v1.endpoints import (
     admin,
@@ -93,14 +92,6 @@ def custom_openapi():
     return app.openapi_schema
 
 app.openapi = custom_openapi
-
-@app.get("/scalar", include_in_schema=False)
-async def scalar_html():
-    return get_scalar_api_reference(
-        openapi_url=app.openapi_url,
-        title="Sentinel Auth Vault API",
-        servers=[{"url": "http://localhost:8000"}],
-    )
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def root():
@@ -493,7 +484,6 @@ async def root():
                     <span style="color: var(--accent-cyan);">●</span> <span id="nav-username">Operator</span>
                 </div>
                 <a href="/docs" target="_blank" class="btn">📖 Swagger UI</a>
-                <a href="/scalar" target="_blank" class="btn btn-primary">⚡ Scalar UI</a>
                 <button onclick="logoutUser()" id="btn-logout" class="btn btn-danger hidden">Logout</button>
             </div>
         </header>

@@ -18,7 +18,7 @@ Sentinel Auth Vault provides a secure, scalable, and autonomous authentication f
 - **API:** FastAPI
 - **Database:** PostgreSQL (Async)
 - **Cache:** Redis
-- **Documentation:** Scalar (Interactive OpenAPI)
+- **Documentation:** Swagger UI (Interactive OpenAPI)
 
 ## Installation & Setup
 ### Prerequisites
@@ -29,10 +29,10 @@ Sentinel Auth Vault provides a secure, scalable, and autonomous authentication f
 1. Clone the repository.
 2. Configure `.env` file based on `.env.example`.
 3. Run `docker-compose up -d`.
-4. Access API Docs/UI at `http://localhost:8000/scalar`.
+4. Access API Docs/UI at `http://localhost:8000/docs`.
 
 ## Documentation
-- **Interactive UI:** [http://localhost:8000/scalar](http://localhost:8000/scalar)
+- **Interactive UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
 - **Metrics:** `GET /api/v1/metrics`
 - **Health:** `GET /api/v1/health`
 

@@ -9,13 +9,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
-        # Allow documentation paths to load Swagger and Scalar UI assets
-        if request.url.path in ["/docs", "/scalar", "/redoc", "/openapi.json", "/"]:
+        # Allow documentation paths to load Swagger assets
+        if request.url.path in ["/docs", "/redoc", "/openapi.json", "/"]:
             response.headers["Content-Security-Policy"] = (
-                "default-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fastapi.tiangolo.com https://cdn.scalar.com; "
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.scalar.com; "
-                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.scalar.com https://fonts.googleapis.com; "
-                "img-src 'self' data: https://fastapi.tiangolo.com https://cdn.scalar.com; "
+                "default-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fastapi.tiangolo.com; "
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
+                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+                "img-src 'self' data: https://fastapi.tiangolo.com; "
                 "font-src 'self' https://fonts.gstatic.com data:;"
             )
         else:
