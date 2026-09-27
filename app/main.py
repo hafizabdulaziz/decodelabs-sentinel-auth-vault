@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import HTMLResponse
 
@@ -92,6 +93,82 @@ def custom_openapi():
     return app.openapi_schema
 
 app.openapi = custom_openapi
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    html_response = get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title="Sentinel Auth Vault - Enterprise API Documentation",
+        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
+        swagger_favicon_url="https://fastapi.tiangolo.com/img/favicon.png",
+    )
+    custom_css = """
+    <style>
+        body {
+            background-color: #0d1117 !important;
+            color: #f0f6fc !important;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        .swagger-ui .topbar {
+            background-color: #161b22 !important;
+            border-bottom: 1px solid #30363d !important;
+            padding: 10px 0;
+        }
+        .swagger-ui .info h1, .swagger-ui .info p, .swagger-ui .info table, .swagger-ui .info li, .swagger-ui .info td, .swagger-ui .info th {
+            color: #f0f6fc !important;
+        }
+        .swagger-ui .info .title {
+            color: #38bdf8 !important;
+        }
+        .swagger-ui .scheme-container {
+            background-color: #161b22 !important;
+            box-shadow: none !important;
+            border: 1px solid #30363d !important;
+            border-radius: 8px;
+        }
+        .swagger-ui .opblock {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+            border-radius: 10px !important;
+            box-shadow: none !important;
+        }
+        .swagger-ui .opblock.opblock-get { background-color: rgba(56, 189, 248, 0.05) !important; border-color: rgba(56, 189, 248, 0.2) !important; }
+        .swagger-ui .opblock.opblock-post { background-color: rgba(16, 185, 129, 0.05) !important; border-color: rgba(16, 185, 129, 0.2) !important; }
+        .swagger-ui .opblock.opblock-delete { background-color: rgba(244, 63, 94, 0.05) !important; border-color: rgba(244, 63, 94, 0.2) !important; }
+        .swagger-ui .opblock .opblock-summary-path, .swagger-ui .opblock .opblock-summary-description {
+            color: #f0f6fc !important;
+        }
+        .swagger-ui .btn {
+            background-color: #21262d !important;
+            color: #f0f6fc !important;
+            border: 1px solid #30363d !important;
+            border-radius: 6px !important;
+        }
+        .swagger-ui .btn.authorize {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.2)) !important;
+            border-color: rgba(56, 189, 248, 0.4) !important;
+            color: #38bdf8 !important;
+        }
+        .swagger-ui input[type=text], .swagger-ui textarea, .swagger-ui select {
+            background-color: #0d1117 !important;
+            color: #f0f6fc !important;
+            border: 1px solid #30363d !important;
+            border-radius: 6px !important;
+        }
+        .swagger-ui .dialog-ux {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+            color: #f0f6fc !important;
+        }
+        .swagger-ui table tspan, .swagger-ui table td, .swagger-ui table th {
+            color: #f0f6fc !important;
+        }
+    </style>
+    """
+    html_content = html_response.body.decode("utf-8")
+    html_content = html_content.replace("</head>", f"{custom_css}</head>")
+    return HTMLResponse(content=html_content)
 
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def root():
