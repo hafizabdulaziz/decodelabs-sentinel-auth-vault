@@ -637,6 +637,7 @@ async def root():
                     <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active">📊 Overview & Health</button>
                     <button onclick="switchTab('auth')" id="tab-btn-auth" class="tab-btn">🔑 Auth & JWT Inspector</button>
                     <button onclick="switchTab('mfa')" id="tab-btn-mfa" class="tab-btn">🔒 MFA Operations</button>
+                    <button onclick="switchTab('api')" id="tab-btn-api" class="tab-btn">📖 Interactive API Docs</button>
                     <button onclick="switchTab('audit')" id="tab-btn-audit" class="tab-btn">🛡️ Security Audit Logs</button>
                 </div>
                 <div style="font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
@@ -830,7 +831,26 @@ async def root():
                 </div>
             </div>
 
-            <!-- TAB 4: SECURITY AUDIT LOGS -->
+            <!-- TAB 4: INTERACTIVE API DOCS -->
+            <div id="tab-content-api" class="tab-content hidden">
+                <div class="card" style="padding: 0; overflow: hidden; background: #0f172a; border-color: var(--border-color);">
+                    <div class="card-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0;">
+                        <div>
+                            <span class="card-title">Embedded Enterprise API Explorer</span>
+                            <div style="font-size: 0.85rem; color: var(--text-primary); font-weight: 600; margin-top: 0.2rem;">Swagger UI with Automatic JWT Token Injection</div>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                            <button onclick="updateSwaggerAuth()" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">🔑 Inject Active Token</button>
+                            <a href="/docs" target="_blank" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">Open Fullscreen ↗</a>
+                        </div>
+                    </div>
+                    <div style="width: 100%; height: 850px; background: #0f172a;">
+                        <iframe id="swagger-iframe" src="/docs" onload="updateSwaggerAuth()" style="width: 100%; height: 100%; border: none; background: #0f172a;"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: SECURITY AUDIT LOGS -->
             <div id="tab-content-audit" class="tab-content hidden">
                 <div class="card">
                     <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
@@ -906,6 +926,27 @@ async def root():
                     refreshAllData();
                 } else if (tabId === 'audit') {
                     fetchAuditLogs();
+                } else if (tabId === 'api') {
+                    updateSwaggerAuth();
+                }
+            }
+
+            function updateSwaggerAuth() {
+                const iframe = document.getElementById('swagger-iframe');
+                if (iframe && iframe.contentWindow && iframe.contentWindow.ui) {
+                    if (authToken) {
+                        try {
+                            iframe.contentWindow.ui.authActions.authorize({
+                                BearerAuth: {
+                                    name: "BearerAuth",
+                                    schema: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+                                    value: authToken
+                                }
+                            });
+                        } catch (e) {
+                            console.error('Swagger auth injection error', e);
+                        }
+                    }
                 }
             }
 
