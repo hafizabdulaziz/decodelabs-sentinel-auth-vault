@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
@@ -19,11 +20,7 @@ from app.api.v1.endpoints import (
 from app.core.security_headers import SecurityHeadersMiddleware
 from app.db.base_class import Base
 from app.db.session import engine
-from app.models.user import User
-from app.models.mfa import MFAModel
-from app.models.token import RefreshToken
-from app.models.role import Role, user_roles
-from app.models.audit import AuditLog
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -648,7 +645,7 @@ async def root():
 
             <!-- TAB 1: OVERVIEW -->
             <div id="tab-content-overview" class="tab-content">
-                <div class="grid-4">
+                <div class="grid-2" style="max-width: 900px; margin: 0 auto;">
                     <div class="card">
                         <div class="card-header">
                             <span class="card-title">System Health</span>
@@ -667,60 +664,6 @@ async def root():
                         <div id="stat-token-state" class="card-value" style="color: var(--accent-cyan);">Active</div>
                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
                             Session: <span id="stat-token-indicator" style="color: var(--accent-amber);">Not Set</span>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">Perimeter Defense</span>
-                            <div class="card-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--accent-indigo);">🛡️</div>
-                        </div>
-                        <div class="card-value" style="color: var(--accent-indigo);">Enforced</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                            Sliding-Window & Lockout Active
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">Sentinel Agent</span>
-                            <div class="card-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--accent-amber);">🤖</div>
-                        </div>
-                        <div class="card-value" style="color: var(--accent-amber);">Autonomous</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                            Threat Intel & Tools Ready
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">System Metrics & Telemetry</span>
-                            <a href="/api/v1/metrics" target="_blank" style="font-size: 0.75rem; color: var(--accent-cyan); text-decoration: none;">Raw Metrics ↗</a>
-                        </div>
-                        <div id="metrics-container" style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.75rem; height: 220px; overflow-y: auto; color: var(--text-secondary);">
-                            Loading metrics...
-                        </div>
-                    </div>
-                    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <div class="card-header">
-                                <span class="card-title">Quick Diagnostics</span>
-                            </div>
-                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                <button onclick="testHealthEndpoint()" class="btn" style="width: 100%; justify-content: space-between;">
-                                    <span>🩺 Ping /api/v1/health</span><span>→</span>
-                                </button>
-                                <button onclick="testProtectedEndpoint()" class="btn" style="width: 100%; justify-content: space-between;">
-                                    <span>🔐 Test /api/v1/users/me</span><span>→</span>
-                                </button>
-                                <button onclick="testAgentEndpoint()" class="btn" style="width: 100%; justify-content: space-between;">
-                                    <span>🤖 Ping Sentinel Agent</span><span>→</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 1rem; font-size: 0.75rem; color: var(--text-secondary); display: flex; justify-content: space-between;">
-                            <span>Sentinel Core Engine</span>
-                            <span style="color: var(--accent-emerald);">Secure</span>
                         </div>
                     </div>
                 </div>

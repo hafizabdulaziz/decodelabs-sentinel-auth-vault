@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -45,7 +45,7 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     except Exception as e:
         import traceback
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Internal server error during registration: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error during registration: {e!s}")
 
 @router.post("/login", dependencies=[Depends(RateLimitChecker(limit=5, window=60))])
 async def login(login_in: LoginRequest, db: AsyncSession = Depends(get_db)):
@@ -90,4 +90,4 @@ async def login(login_in: LoginRequest, db: AsyncSession = Depends(get_db)):
     except Exception as e:
         import traceback
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Internal server error during login: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error during login: {e!s}")
