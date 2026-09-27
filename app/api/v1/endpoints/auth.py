@@ -19,7 +19,7 @@ from app.db.session import get_db
 from app.models.mfa import MFAModel
 from app.models.token import RefreshToken
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import LoginRequest, UserCreate
 
 router = APIRouter()
 
@@ -48,20 +48,13 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Internal server error during registration: {str(e)}")
 
 @router.post("/login", dependencies=[Depends(RateLimitChecker(limit=5, window=60))])
-async def login(request: Request, db: AsyncSession = Depends(get_db)):
+async def login(login_in: LoginRequest, db: AsyncSession = Depends(get_db)):
     try:
-        content_type = request.headers.get("content-type", "")
-        if "application/json" in content_type:
-            body = await request.json()
-            email = normalize_email(body.get("email") or body.get("username", ""))
-            password = body.get("password", "")
-        else:
-            form = await request.form()
-            email = normalize_email(form.get("username") or form.get("email", ""))
-            password = form.get("password", "")
+        email = normalize_email(login_in.email)
+        password = login_in.password
             
         if not email or not password:
-            raise HTTPException(status_code=400, detail="Email/username and password are required")
+            raise HTTPException(status_code=400, detail="Email and password are required")
 
         result = await db.execute(select(User).where(User.email == email))
         user = result.scalars().first()

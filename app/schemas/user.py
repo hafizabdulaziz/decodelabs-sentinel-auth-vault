@@ -27,3 +27,8 @@ class UserUpdate(BaseModel):
 class PasswordChange(BaseModel):
     current_password: str
     new_password: str = Field(..., min_length=8)
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
