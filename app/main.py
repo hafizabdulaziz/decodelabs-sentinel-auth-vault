@@ -103,78 +103,91 @@ async def custom_swagger_ui_html():
     custom_css = """
     <style>
         body {
-            background-color: #0d1117 !important;
-            color: #f0f6fc !important;
+            background-color: #0b0f19 !important;
+            color: #f8fafc !important;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         }
         .swagger-ui {
-            color: #f0f6fc !important;
+            color: #f8fafc !important;
         }
         .swagger-ui .topbar {
-            background-color: #161b22 !important;
-            border-bottom: 1px solid #30363d !important;
+            background-color: #0b0f19 !important;
+            border-bottom: 1px solid #334155 !important;
             padding: 12px 0;
         }
         .swagger-ui .topbar .download-url-wrapper { display: none !important; }
         .swagger-ui .info h1, .swagger-ui .info h2, .swagger-ui .info h3, .swagger-ui .info h4, .swagger-ui .info p, .swagger-ui .info table, .swagger-ui .info li, .swagger-ui .info td, .swagger-ui .info th {
-            color: #f0f6fc !important;
+            color: #f8fafc !important;
         }
         .swagger-ui .info .title {
             color: #38bdf8 !important;
             font-weight: 700 !important;
         }
         .swagger-ui .scheme-container {
-            background-color: #161b22 !important;
+            background-color: #1e293b !important;
             box-shadow: none !important;
-            border: 1px solid #30363d !important;
-            border-radius: 10px;
+            border: 1px solid #334155 !important;
+            border-radius: 8px !important;
             padding: 1rem;
             margin: 20px 0;
         }
         .swagger-ui .opblock {
-            background-color: #161b22 !important;
-            border: 1px solid #30363d !important;
-            border-radius: 10px !important;
+            background-color: #1e293b !important;
+            border: 1px solid #334155 !important;
+            border-radius: 8px !important;
             box-shadow: none !important;
             margin-bottom: 12px !important;
+            transition: border-color 0.2s;
         }
-        .swagger-ui .opblock.opblock-get { background-color: rgba(56, 189, 248, 0.05) !important; border-color: rgba(56, 189, 248, 0.25) !important; }
-        .swagger-ui .opblock.opblock-post { background-color: rgba(16, 185, 129, 0.05) !important; border-color: rgba(16, 185, 129, 0.25) !important; }
-        .swagger-ui .opblock.opblock-delete { background-color: rgba(244, 63, 94, 0.05) !important; border-color: rgba(244, 63, 94, 0.25) !important; }
-        .swagger-ui .opblock.opblock-put { background-color: rgba(245, 158, 11, 0.05) !important; border-color: rgba(245, 158, 11, 0.25) !important; }
+        .swagger-ui .opblock:hover {
+            border-color: #475569 !important;
+        }
+        .swagger-ui .opblock.opblock-get { background-color: #1e293b !important; border-color: rgba(56, 189, 248, 0.3) !important; }
+        .swagger-ui .opblock.opblock-post { background-color: #1e293b !important; border-color: rgba(16, 185, 129, 0.3) !important; }
+        .swagger-ui .opblock.opblock-delete { background-color: #1e293b !important; border-color: rgba(244, 63, 94, 0.3) !important; }
+        .swagger-ui .opblock.opblock-put { background-color: #1e293b !important; border-color: rgba(245, 158, 11, 0.3) !important; }
         
         .swagger-ui .opblock .opblock-summary-path, .swagger-ui .opblock .opblock-summary-description {
-            color: #f0f6fc !important;
+            color: #f8fafc !important;
         }
         .swagger-ui .opblock .opblock-summary-method {
             border-radius: 6px !important;
             font-weight: 700 !important;
+            color: #ffffff !important;
+            text-shadow: none !important;
+            padding: 6px 12px !important;
         }
+        .swagger-ui .opblock.opblock-get .opblock-summary-method { background: #0284c7 !important; }
+        .swagger-ui .opblock.opblock-post .opblock-summary-method { background: #059669 !important; }
+        .swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #e11d48 !important; }
+        .swagger-ui .opblock.opblock-put .opblock-summary-method { background: #d97706 !important; }
+
         .swagger-ui .opblock-body {
-            background-color: #161b22 !important;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
+            background-color: #0b0f19 !important;
+            border-bottom-left-radius: 8px !important;
+            border-bottom-right-radius: 8px !important;
         }
         .swagger-ui .opblock-section-header {
-            background-color: #21262d !important;
+            background-color: #1e293b !important;
             box-shadow: none !important;
-            border-bottom: 1px solid #30363d !important;
-            color: #f0f6fc !important;
+            border-bottom: 1px solid #334155 !important;
+            color: #f8fafc !important;
+            border-radius: 0 !important;
         }
         .swagger-ui .opblock-section-header h4 {
-            color: #f0f6fc !important;
+            color: #f8fafc !important;
         }
         .swagger-ui .btn {
-            background-color: #21262d !important;
-            color: #f0f6fc !important;
-            border: 1px solid #30363d !important;
+            background-color: #1e293b !important;
+            color: #f8fafc !important;
+            border: 1px solid #334155 !important;
             border-radius: 6px !important;
             box-shadow: none !important;
             font-weight: 600 !important;
         }
         .swagger-ui .btn:hover {
-            background-color: #30363d !important;
-            border-color: #8b949e !important;
+            background-color: #334155 !important;
+            border-color: #64748b !important;
         }
         .swagger-ui .btn.authorize {
             background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.2)) !important;
@@ -182,9 +195,9 @@ async def custom_swagger_ui_html():
             color: #38bdf8 !important;
         }
         .swagger-ui input[type=text], .swagger-ui textarea, .swagger-ui select {
-            background-color: #0d1117 !important;
-            color: #f0f6fc !important;
-            border: 1px solid #30363d !important;
+            background-color: #0b0f19 !important;
+            color: #f8fafc !important;
+            border: 1px solid #334155 !important;
             border-radius: 6px !important;
         }
         .swagger-ui textarea:focus, .swagger-ui input[type=text]:focus {
@@ -192,36 +205,47 @@ async def custom_swagger_ui_html():
             outline: none !important;
         }
         .swagger-ui .dialog-ux {
-            background-color: #161b22 !important;
-            border: 1px solid #30363d !important;
-            color: #f0f6fc !important;
+            background-color: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7) !important;
+            border-radius: 8px !important;
         }
         .swagger-ui .model-box {
-            background-color: #0d1117 !important;
+            background-color: #0b0f19 !important;
             border-radius: 8px;
             padding: 10px;
+            border: 1px solid #334155 !important;
         }
         .swagger-ui .model {
-            color: #f0f6fc !important;
+            color: #f8fafc !important;
         }
         .swagger-ui .prop-type {
             color: #38bdf8 !important;
         }
         .swagger-ui table tspan, .swagger-ui table td, .swagger-ui table th {
-            color: #f0f6fc !important;
+            color: #f8fafc !important;
         }
         .swagger-ui .response-col_status, .swagger-ui .response-col_description {
-            color: #f0f6fc !important;
+            color: #f8fafc !important;
         }
         .swagger-ui .parameter__name, .swagger-ui .parameter__type, .swagger-ui .parameter__deprecated {
-            color: #f0f6fc !important;
+            color: #f8fafc !important;
         }
         .swagger-ui .tab li {
-            color: #8b949e !important;
+            color: #94a3b8 !important;
         }
         .swagger-ui .tab li.active {
             color: #38bdf8 !important;
+        }
+        .swagger-ui .opblock-body pre {
+            background-color: #0b0f19 !important;
+            color: #f8fafc !important;
+            border-radius: 6px;
+            border: 1px solid #334155;
+        }
+        .swagger-ui table.-striped tbody tr:nth-child(odd) td {
+            background-color: transparent !important;
         }
     </style>
     """
@@ -240,12 +264,12 @@ async def root():
         <title>Sentinel Auth Vault - Enterprise SOC Dashboard</title>
         <style>
             :root {
-                --bg-main: #0d1117;
-                --bg-card: #161b22;
-                --bg-card-hover: #1f242c;
-                --border-color: #30363d;
-                --text-primary: #f0f6fc;
-                --text-secondary: #8b949e;
+                --bg-main: #0b0f19;
+                --bg-card: #1e293b;
+                --bg-card-hover: #334155;
+                --border-color: #334155;
+                --text-primary: #f8fafc;
+                --text-secondary: #94a3b8;
                 --accent-cyan: #38bdf8;
                 --accent-emerald: #10b981;
                 --accent-indigo: #6366f1;
@@ -253,6 +277,7 @@ async def root():
                 --accent-rose: #f43f5e;
             }
 
+            html { scroll-behavior: smooth; }
             * { box-sizing: border-box; margin: 0; padding: 0; }
             body {
                 background-color: var(--bg-main);
@@ -606,14 +631,13 @@ async def root():
 
             <!-- TAB 1: INTERACTIVE API DOCS (DEFAULT) -->
             <div id="tab-content-api" class="tab-content">
-                <div class="card" style="padding: 0; overflow: hidden; background: #0f172a; border-color: var(--border-color);">
+                <div class="card" style="padding: 0; overflow: hidden; background: #0f172a; border-color: var(--border-color); border-radius: 12px;">
                     <div class="card-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0;">
                         <div>
                             <span class="card-title">Embedded Enterprise API Explorer</span>
-                            <div style="font-size: 0.85rem; color: var(--text-primary); font-weight: 600; margin-top: 0.2rem;">Swagger UI with Automatic JWT Token Injection</div>
+                            <div style="font-size: 0.85rem; color: var(--text-primary); font-weight: 600; margin-top: 0.2rem;">Swagger UI Interface</div>
                         </div>
                         <div style="display: flex; gap: 0.75rem; align-items: center;">
-                            <button onclick="updateSwaggerAuth()" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">🔑 Inject Active Token</button>
                             <a href="/docs" target="_blank" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">Open Fullscreen ↗</a>
                         </div>
                     </div>
