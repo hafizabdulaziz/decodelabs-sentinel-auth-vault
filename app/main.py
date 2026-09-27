@@ -304,18 +304,6 @@ async def root():
                 font-size: 0.75rem;
                 color: var(--text-secondary);
             }
-            .badge-secure {
-                background: rgba(16, 185, 129, 0.1);
-                border: 1px solid rgba(16, 185, 129, 0.3);
-                color: var(--accent-emerald);
-                padding: 0.2rem 0.6rem;
-                border-radius: 20px;
-                font-size: 0.7rem;
-                font-weight: 600;
-                display: inline-flex;
-                align-items: center;
-                gap: 0.3rem;
-            }
             .pulse {
                 width: 6px;
                 height: 6px;
@@ -419,12 +407,6 @@ async def root():
             }
 
             /* Grid Layouts */
-            .grid-4 {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-                gap: 1.25rem;
-                margin-bottom: 2rem;
-            }
             .grid-2 {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -451,21 +433,6 @@ async def root():
                 letter-spacing: 0.05em;
                 color: var(--text-secondary);
                 font-weight: 600;
-            }
-            .card-value {
-                font-size: 1.8rem;
-                font-weight: 700;
-                color: var(--text-primary);
-                margin-top: 0.2rem;
-            }
-            .card-icon {
-                width: 42px;
-                height: 42px;
-                border-radius: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.2rem;
             }
 
             /* Form Elements */
@@ -616,10 +583,6 @@ async def root():
                 </div>
             </div>
             <div class="nav-actions">
-                <div id="session-status-badge" class="btn hidden" style="cursor: default;">
-                    <span style="color: var(--accent-cyan);">●</span> <span id="nav-username">Operator</span>
-                </div>
-                <a href="/docs" target="_blank" class="btn">📖 Swagger UI</a>
                 <button onclick="logoutUser()" id="btn-logout" class="btn btn-danger hidden">Logout</button>
             </div>
         </header>
@@ -631,10 +594,8 @@ async def root():
             <!-- Tabs Navigation -->
             <div class="tabs-container">
                 <div class="tabs">
-                    <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn active">📊 Overview & Health</button>
+                    <button onclick="switchTab('api')" id="tab-btn-api" class="tab-btn active">📖 Interactive API Docs</button>
                     <button onclick="switchTab('auth')" id="tab-btn-auth" class="tab-btn">🔑 Auth & JWT Inspector</button>
-                    <button onclick="switchTab('mfa')" id="tab-btn-mfa" class="tab-btn">🔒 MFA Operations</button>
-                    <button onclick="switchTab('api')" id="tab-btn-api" class="tab-btn">📖 Interactive API Docs</button>
                     <button onclick="switchTab('audit')" id="tab-btn-audit" class="tab-btn">🛡️ Security Audit Logs</button>
                 </div>
                 <div style="font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
@@ -643,28 +604,21 @@ async def root():
                 </div>
             </div>
 
-            <!-- TAB 1: OVERVIEW -->
-            <div id="tab-content-overview" class="tab-content">
-                <div class="grid-2" style="max-width: 900px; margin: 0 auto;">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">System Health</span>
-                            <div class="card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald);">🩺</div>
+            <!-- TAB 1: INTERACTIVE API DOCS (DEFAULT) -->
+            <div id="tab-content-api" class="tab-content">
+                <div class="card" style="padding: 0; overflow: hidden; background: #0f172a; border-color: var(--border-color);">
+                    <div class="card-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0;">
+                        <div>
+                            <span class="card-title">Embedded Enterprise API Explorer</span>
+                            <div style="font-size: 0.85rem; color: var(--text-primary); font-weight: 600; margin-top: 0.2rem;">Swagger UI with Automatic JWT Token Injection</div>
                         </div>
-                        <div id="stat-health-status" class="card-value" style="color: var(--accent-emerald);">Checking...</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                            <span id="stat-db-status">DB: Connected</span> • <span id="stat-redis-status">Redis: Connected</span>
+                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                            <button onclick="updateSwaggerAuth()" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">🔑 Inject Active Token</button>
+                            <a href="/docs" target="_blank" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">Open Fullscreen ↗</a>
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">Auth Token State</span>
-                            <div class="card-icon" style="background: rgba(56, 189, 248, 0.1); color: var(--accent-cyan);">🎫</div>
-                        </div>
-                        <div id="stat-token-state" class="card-value" style="color: var(--accent-cyan);">Active</div>
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                            Session: <span id="stat-token-indicator" style="color: var(--accent-amber);">Not Set</span>
-                        </div>
+                    <div style="width: 100%; height: 850px; background: #0f172a;">
+                        <iframe id="swagger-iframe" src="/docs" onload="updateSwaggerAuth()" style="width: 100%; height: 100%; border: none; background: #0f172a;"></iframe>
                     </div>
                 </div>
             </div>
@@ -739,61 +693,7 @@ async def root():
                 </div>
             </div>
 
-            <!-- TAB 3: MFA OPERATIONS -->
-            <div id="tab-content-mfa" class="tab-content hidden">
-                <div class="grid-2">
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">Multi-Factor Authentication (TOTP)</span>
-                        </div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Configure time-based one-time passwords for zero-trust security clearance.</p>
-                        <button onclick="setupMFA()" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem; margin-bottom: 1rem;">
-                            Generate TOTP Secret & QR URI
-                        </button>
-                        <div id="mfa-setup-result" class="hidden" style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; font-family: monospace; font-size: 0.75rem; space-y: 0.5rem;">
-                            <p style="color: var(--text-secondary);">Secret: <span id="mfa-secret-val" style="color: var(--accent-cyan); font-weight: bold;"></span></p>
-                            <p style="color: var(--text-secondary); margin-top: 0.5rem; word-break: break-all;">URI: <span id="mfa-uri-val" style="color: var(--accent-emerald);"></span></p>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <span class="card-title">Verify TOTP Token</span>
-                        </div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Submit 6-digit authenticator code from your authenticator app.</p>
-                        <form onsubmit="verifyMFA(event)">
-                            <div class="form-group">
-                                <label>6-Digit Code</label>
-                                <input type="text" id="mfa-code-input" required maxlength="6" placeholder="123456" style="text-align: center; font-size: 1.2rem; letter-spacing: 0.2rem; font-family: monospace;">
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.8rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(20, 184, 166, 0.2)); border-color: rgba(16, 185, 129, 0.4); color: var(--accent-emerald);">
-                                Verify TOTP Code
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: INTERACTIVE API DOCS -->
-            <div id="tab-content-api" class="tab-content hidden">
-                <div class="card" style="padding: 0; overflow: hidden; background: #0f172a; border-color: var(--border-color);">
-                    <div class="card-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0;">
-                        <div>
-                            <span class="card-title">Embedded Enterprise API Explorer</span>
-                            <div style="font-size: 0.85rem; color: var(--text-primary); font-weight: 600; margin-top: 0.2rem;">Swagger UI with Automatic JWT Token Injection</div>
-                        </div>
-                        <div style="display: flex; gap: 0.75rem; align-items: center;">
-                            <button onclick="updateSwaggerAuth()" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">🔑 Inject Active Token</button>
-                            <a href="/docs" target="_blank" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">Open Fullscreen ↗</a>
-                        </div>
-                    </div>
-                    <div style="width: 100%; height: 850px; background: #0f172a;">
-                        <iframe id="swagger-iframe" src="/docs" onload="updateSwaggerAuth()" style="width: 100%; height: 100%; border: none; background: #0f172a;"></iframe>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 5: SECURITY AUDIT LOGS -->
+            <!-- TAB 3: SECURITY AUDIT LOGS -->
             <div id="tab-content-audit" class="tab-content hidden">
                 <div class="card">
                     <div class="card-header" style="flex-wrap: wrap; gap: 1rem;">
@@ -842,8 +742,11 @@ async def root():
                     inspectJWT(authToken);
                     updateAuthUI(true);
                 }
-                refreshAllData();
-                setInterval(refreshAllData, 10000);
+                updateSwaggerAuth();
+                fetchAuditLogs();
+                setInterval(() => {
+                    fetchAuditLogs();
+                }, 10000);
             });
 
             function showToast(message, type = 'success') {
@@ -865,9 +768,7 @@ async def root():
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
                 document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
                 document.getElementById(`tab-btn-${tabId}`).classList.add('active');
-                if (tabId === 'overview') {
-                    refreshAllData();
-                } else if (tabId === 'audit') {
+                if (tabId === 'audit') {
                     fetchAuditLogs();
                 } else if (tabId === 'api') {
                     updateSwaggerAuth();
@@ -908,42 +809,9 @@ async def root():
             }
 
             async function refreshAllData() {
-                checkHealth();
-                fetchMetrics();
+                updateSwaggerAuth();
                 fetchAuditLogs();
-            }
-
-            async function checkHealth() {
-                try {
-                    const res = await fetch('/api/v1/health');
-                    const data = await res.json();
-                    const healthEl = document.getElementById('stat-health-status');
-                    if (res.ok) {
-                        healthEl.textContent = data.status || 'Healthy';
-                        healthEl.style.color = 'var(--accent-emerald)';
-                        if (data.database) document.getElementById('stat-db-status').textContent = `DB: ${data.database}`;
-                        if (data.redis) document.getElementById('stat-redis-status').textContent = `Redis: ${data.redis}`;
-                    } else {
-                        healthEl.textContent = 'Degraded';
-                        healthEl.style.color = 'var(--accent-rose)';
-                    }
-                } catch (e) {
-                    const healthEl = document.getElementById('stat-health-status');
-                    healthEl.textContent = 'Offline';
-                    healthEl.style.color = 'var(--accent-rose)';
-                }
-            }
-
-            async function fetchMetrics() {
-                try {
-                    const res = await fetch('/api/v1/metrics');
-                    const text = await res.text();
-                    const container = document.getElementById('metrics-container');
-                    const lines = text.split('\\n').filter(l => l && !l.startsWith('#')).slice(0, 30);
-                    container.innerHTML = lines.map(l => `<div><span style="color: var(--accent-cyan);">${l.split(' ')[0]}</span> <span style="color: var(--accent-emerald);">${l.split(' ')[1] || ''}</span></div>`).join('');
-                } catch (e) {
-                    document.getElementById('metrics-container').innerHTML = '<span style="color: var(--accent-rose);">Failed to load metrics.</span>';
-                }
+                showToast('Dashboard data refreshed', 'success');
             }
 
             async function fetchAuditLogs() {
@@ -1003,8 +871,9 @@ async def root():
                         inspectJWT(authToken);
                         updateAuthUI(true);
                         showToast('Authenticated successfully!', 'success');
-                        switchTab('overview');
-                        refreshAllData();
+                        switchTab('api');
+                        updateSwaggerAuth();
+                        fetchAuditLogs();
                     } else {
                         showToast(data.message || data.detail || 'Authentication failed', 'error');
                     }
@@ -1075,26 +944,16 @@ async def root():
                 inspectJWT('');
                 updateAuthUI(false);
                 showToast('Token cleared from session.', 'success');
-                refreshAllData();
+                updateSwaggerAuth();
+                fetchAuditLogs();
             }
 
             function updateAuthUI(isAuthenticated) {
-                const badge = document.getElementById('session-status-badge');
                 const logoutBtn = document.getElementById('btn-logout');
-                const indicator = document.getElementById('stat-token-indicator');
-                const state = document.getElementById('stat-token-state');
                 if (isAuthenticated) {
-                    badge.classList.remove('hidden');
                     logoutBtn.classList.remove('hidden');
-                    indicator.textContent = 'Active JWT';
-                    indicator.style.color = 'var(--accent-emerald)';
-                    state.textContent = 'Authorized';
                 } else {
-                    badge.classList.add('hidden');
                     logoutBtn.classList.add('hidden');
-                    indicator.textContent = 'Not Set';
-                    indicator.style.color = 'var(--accent-amber)';
-                    state.textContent = 'Active';
                 }
             }
 
@@ -1111,101 +970,6 @@ async def root():
                 }
                 navigator.clipboard.writeText(val);
                 showToast('Token copied to clipboard!', 'success');
-            }
-
-            async function testHealthEndpoint() {
-                try {
-                    const res = await fetch('/api/v1/health');
-                    const data = await res.json();
-                    showToast(`Health Check: ${data.status}`, 'success');
-                } catch (e) {
-                    showToast('Health check failed', 'error');
-                }
-            }
-
-            async function testProtectedEndpoint() {
-                if (!authToken) {
-                    showToast('Authentication required. Please login first.', 'error');
-                    switchTab('auth');
-                    return;
-                }
-                try {
-                    const res = await fetch('/api/v1/users/me', {
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                        showToast(`Authenticated as: ${data.email || data.username}`, 'success');
-                    } else {
-                        showToast(data.detail || 'Request failed', 'error');
-                    }
-                } catch (e) {
-                    showToast('Network error testing endpoint', 'error');
-                }
-            }
-
-            async function testAgentEndpoint() {
-                try {
-                    const res = await fetch('/api/v1/agent/status', {
-                        headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {}
-                    });
-                    showToast('Sentinel Agent is online and responsive.', 'success');
-                } catch (e) {
-                    showToast('Agent endpoint reached.', 'success');
-                }
-            }
-
-            async function setupMFA() {
-                if (!authToken) {
-                    showToast('Authentication required for MFA. Please log in first.', 'error');
-                    switchTab('auth');
-                    return;
-                }
-                try {
-                    const res = await fetch('/api/v1/mfa/setup', {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${authToken}` }
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                        document.getElementById('mfa-setup-result').classList.remove('hidden');
-                        document.getElementById('mfa-secret-val').textContent = data.secret || 'JBSWY3DPEHPK3PXP';
-                        document.getElementById('mfa-uri-val').textContent = data.otpauth_url || 'otpauth://totp/...';
-                        showToast('MFA secret generated successfully!', 'success');
-                    } else {
-                        showToast(data.detail || 'MFA setup failed', 'error');
-                    }
-                } catch (e) {
-                    showToast('Error setting up MFA', 'error');
-                }
-            }
-
-            async function verifyMFA(event) {
-                event.preventDefault();
-                const code = document.getElementById('mfa-code-input').value;
-                if (!authToken) {
-                    showToast('Authentication required. Please log in first.', 'error');
-                    switchTab('auth');
-                    return;
-                }
-                try {
-                    const res = await fetch('/api/v1/mfa/verify', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${authToken}`
-                        },
-                        body: JSON.stringify({ token: code })
-                    });
-                    const data = await res.json();
-                    if (res.ok) {
-                        showToast('MFA verified successfully!', 'success');
-                    } else {
-                        showToast(data.detail || 'Invalid MFA code', 'error');
-                    }
-                } catch (e) {
-                    showToast('Network error verifying MFA', 'error');
-                }
             }
 
             function filterAuditLogs() {
