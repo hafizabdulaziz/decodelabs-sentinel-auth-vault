@@ -1,3 +1,5 @@
+import logging
+
 import pyotp
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
@@ -7,6 +9,8 @@ from app.api.deps import get_current_user, get_db
 from app.core.responses import api_response
 from app.models.mfa import MFAModel
 from app.models.user import User
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -42,12 +46,13 @@ async def verify_mfa(request: Request, current_user: User = Depends(get_current_
     try:
         body = await request.json()
         token = body.get("token") or body.get("code")
-    except Exception:
+    except (ValueError, TypeError):
         try:
             form = await request.form()
             token = form.get("token") or form.get("code")
-        except Exception:
-            pass
+        except (ValueError, TypeError) as exc:
+            logger.warning("Failed to parse request body or form: %s", exc)
+            token = None
 
     if not token:
         token = request.query_params.get("token") or request.query_params.get("code")

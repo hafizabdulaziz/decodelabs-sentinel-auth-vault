@@ -27,7 +27,7 @@ class RateLimiter:
                 
             count = results[2]
             return count <= limit
-        except Exception:
+        except (redis.RedisError, ConnectionError, TimeoutError, OSError):
             # Fallback to in-memory rate limiting if Redis is offline
             if key not in self.memory_store:
                 self.memory_store[key] = []
