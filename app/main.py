@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBearer
 
 from app.api.v1.endpoints import (
     admin,
@@ -31,6 +32,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Sentinel Auth Vault API",
     version="1.0.0",
+    swagger_ui_parameters={"persistAuthorization": True},
     description="""
 # Sentinel Auth Vault API
 
@@ -70,22 +72,28 @@ app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 app.include_router(agent.router, prefix="/api/v1/agent", tags=["agent"])
 app.include_router(audit.router, prefix="/api/v1/audit", tags=["audit"])
 
+security_scheme = HTTPBearer(bearerFormat="JWT", auto_error=False)
+
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
-        title="Sentinel Auth Vault API",
-        version="1.0.0",
-        description="Official API Documentation for Sentinel Auth Vault.",
+        title=app.title,
+        version=app.version,
+        description=app.description,
         routes=app.routes,
     )
+    if "components" not in openapi_schema:
+        openapi_schema["components"] = {}
     openapi_schema["components"]["securitySchemes"] = {
-        "BearerAuth": {
+        "HTTPBearer": {
             "type": "http",
             "scheme": "bearer",
             "bearerFormat": "JWT",
+            "description": "Enter JWT bearer token"
         }
     }
+    openapi_schema["security"] = [{"HTTPBearer": []}]
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
@@ -102,114 +110,52 @@ async def custom_swagger_ui_html():
     )
     custom_css = """
     <style>
-        body {
-            background-color: #0b0f19 !important;
-            color: #f8fafc !important;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        /* Ensure iframe body has no unwanted scroll height */
+        html, body {
+          height: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          overflow: hidden !important;
+          background-color: #0b0f19 !important;
+          color: #f8fafc !important;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         }
-        .swagger-ui {
-            color: #f8fafc !important;
-        }
-        .swagger-ui .topbar {
-            background-color: #0b0f19 !important;
-            border-bottom: 1px solid #334155 !important;
-            padding: 12px 0;
-        }
-        .swagger-ui .topbar .download-url-wrapper { display: none !important; }
-        .swagger-ui .info h1, .swagger-ui .info h2, .swagger-ui .info h3, .swagger-ui .info h4, .swagger-ui .info p, .swagger-ui .info table, .swagger-ui .info li, .swagger-ui .info td, .swagger-ui .info th {
-            color: #f8fafc !important;
-        }
-        .swagger-ui .info .title {
-            color: #38bdf8 !important;
-            font-weight: 700 !important;
-        }
-        .swagger-ui .scheme-container {
-            background-color: #1e293b !important;
-            box-shadow: none !important;
-            border: 1px solid #334155 !important;
-            border-radius: 8px !important;
-            padding: 1rem;
-            margin: 20px 0;
-        }
-        .swagger-ui .opblock {
-            background-color: #1e293b !important;
-            border: 1px solid #334155 !important;
-            border-radius: 8px !important;
-            box-shadow: none !important;
-            margin-bottom: 12px !important;
-            transition: border-color 0.2s;
-        }
-        .swagger-ui .opblock:hover {
-            border-color: #475569 !important;
-        }
-        .swagger-ui .opblock.opblock-get { background-color: #1e293b !important; border-color: rgba(56, 189, 248, 0.3) !important; }
-        .swagger-ui .opblock.opblock-post { background-color: #1e293b !important; border-color: rgba(16, 185, 129, 0.3) !important; }
-        .swagger-ui .opblock.opblock-delete { background-color: #1e293b !important; border-color: rgba(244, 63, 94, 0.3) !important; }
-        .swagger-ui .opblock.opblock-put { background-color: #1e293b !important; border-color: rgba(245, 158, 11, 0.3) !important; }
-        
-        .swagger-ui .opblock .opblock-summary-path, .swagger-ui .opblock .opblock-summary-description {
-            color: #f8fafc !important;
-        }
-        .swagger-ui .opblock .opblock-summary-method {
-            border-radius: 6px !important;
-            font-weight: 700 !important;
-            color: #ffffff !important;
-            text-shadow: none !important;
-            padding: 6px 12px !important;
-        }
-        .swagger-ui .opblock.opblock-get .opblock-summary-method { background: #0284c7 !important; }
-        .swagger-ui .opblock.opblock-post .opblock-summary-method { background: #059669 !important; }
-        .swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #e11d48 !important; }
-        .swagger-ui .opblock.opblock-put .opblock-summary-method { background: #d97706 !important; }
 
-        .swagger-ui .opblock-body {
-            background-color: #0b0f19 !important;
-            border-bottom-left-radius: 8px !important;
-            border-bottom-right-radius: 8px !important;
-        }
-        .swagger-ui .opblock-section-header {
-            background-color: #1e293b !important;
-            box-shadow: none !important;
-            border-bottom: 1px solid #334155 !important;
-            color: #f8fafc !important;
-            border-radius: 0 !important;
-        }
-        .swagger-ui .opblock-section-header h4 {
-            color: #f8fafc !important;
-        }
-        .swagger-ui .btn {
-            background-color: #1e293b !important;
-            color: #f8fafc !important;
-            border: 1px solid #334155 !important;
-            border-radius: 6px !important;
-            box-shadow: none !important;
-            font-weight: 600 !important;
-        }
-        .swagger-ui .btn:hover {
-            background-color: #334155 !important;
-            border-color: #64748b !important;
-        }
-        .swagger-ui .btn.authorize {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(99, 102, 241, 0.2)) !important;
-            border-color: rgba(56, 189, 248, 0.4) !important;
-            color: #38bdf8 !important;
-        }
-        .swagger-ui input[type=text], .swagger-ui textarea, .swagger-ui select {
-            background-color: #0b0f19 !important;
-            color: #f8fafc !important;
-            border: 1px solid #334155 !important;
-            border-radius: 6px !important;
-        }
-        .swagger-ui textarea:focus, .swagger-ui input[type=text]:focus {
-            border-color: #38bdf8 !important;
-            outline: none !important;
-        }
+        /* Modal Overlay Wrapper: Absolute center in iframe viewport */
         .swagger-ui .dialog-ux {
-            background-color: #1e293b !important;
-            border: 1px solid #334155 !important;
-            color: #f8fafc !important;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7) !important;
-            border-radius: 8px !important;
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          background: rgba(0, 0, 0, 0.65) !important;
+          z-index: 999999 !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+
+        /* Modal Content Box: Exact size & zero top shift */
+        .swagger-ui .dialog-ux .modal-ux {
+          position: relative !important;
+          top: 0 !important;
+          left: 0 !important;
+          transform: none !important;
+          margin: 0 auto !important;
+          width: 550px !important;
+          max-width: 90vw !important;
+          max-height: 75vh !important;
+          overflow-y: auto !important;
+          border-radius: 8px !important;
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4) !important;
+          background-color: #1e293b !important;
+          border: 1px solid #334155 !important;
+          color: #f8fafc !important;
+          padding: 2rem !important;
         }
         .swagger-ui .model-box {
             background-color: #0b0f19 !important;
@@ -246,6 +192,9 @@ async def custom_swagger_ui_html():
         }
         .swagger-ui table.-striped tbody tr:nth-child(odd) td {
             background-color: transparent !important;
+        }
+        .swagger-ui .scheme-container {
+            padding: 10px 0 !important;
         }
     </style>
     """
@@ -631,7 +580,7 @@ async def root():
 
             <!-- TAB 1: INTERACTIVE API DOCS (DEFAULT) -->
             <div id="tab-content-api" class="tab-content">
-                <div class="card" style="padding: 0; overflow: hidden; background: #0f172a; border-color: var(--border-color); border-radius: 12px;">
+                <div class="card" style="padding: 0; background: #0f172a; border-color: var(--border-color); border-radius: 12px;">
                     <div class="card-header" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0;">
                         <div>
                             <span class="card-title">Embedded Enterprise API Explorer</span>
@@ -641,7 +590,7 @@ async def root():
                             <a href="/docs" target="_blank" class="btn" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">Open Fullscreen ↗</a>
                         </div>
                     </div>
-                    <div style="width: 100%; height: 850px; background: #0f172a;">
+                    <div style="width: 100%; height: calc(100vh - 180px); min-height: 650px; background: #0f172a;">
                         <iframe id="swagger-iframe" src="/docs" onload="updateSwaggerAuth()" style="width: 100%; height: 100%; border: none; background: #0f172a;"></iframe>
                     </div>
                 </div>

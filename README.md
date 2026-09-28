@@ -1,127 +1,108 @@
 # Sentinel Auth Vault
 
-Production-ready, zero-trust authentication engine and security management platform built with Python 3.13 and FastAPI. The service provides enterprise-grade identity lifecycle management, token rotation, multi-factor authentication (TOTP), security audit logging, sliding-window rate limiting, and an integrated SOC dashboard.
-
-Designed using asynchronous I/O and non-blocking database access, this architecture handles active session revocation, agent status telemetry, and centralized security monitoring for high-assurance microservices.
+Sentinel Auth Vault is a production-ready, asynchronous Python backend service built with FastAPI and SQLAlchemy async. It solves enterprise authentication and access control challenges by providing robust JWT-based authentication, multi-factor authentication (MFA with TOTP), role-based access control (RBAC), Redis-backed sliding-window rate limiting, account lockout mechanisms, security headers middleware, and built-in health/metrics instrumentation.
 
 ---
 
-## Technical Stack & Architecture
+## Key Architecture & Technical Stack
 
-- **Framework**: FastAPI (Python 3.13, Async I/O)
-- **Database & ORM**: PostgreSQL / Neon Serverless via SQLAlchemy 2.0 (AsyncSession)
-- **Database Migrations**: Alembic (Asynchronous migration pipeline)
-- **Caching & Revocation**: Redis (Sliding-window rate limiting & JWT revocation blacklist)
-- **Security & Cryptography**: Password hashing via Argon2id, JWT auth (Access/Refresh token rotation), PyOTP (TOTP 2FA)
-- **Observability**: Prometheus metrics, structured JSON logging, and system health diagnostics
-- **User Interface**: Integrated SOC Dashboard and Dark-Mode OpenAPI/Swagger docs
-
----
-
-## Core Features & System Capabilities
-
-1. **Authentication & Session Lifecycle**:
-   - Operator registration, authentication, and JWT pair issuance (Access/Refresh tokens).
-   - Refresh token rotation with database persistence and real-time verification.
-   - Active session logout with instant Redis token blacklisting.
-
-2. **Multi-Factor Authentication (MFA/TOTP)**:
-   - Secret key generation, QR code provisioning, and time-based OTP validation.
-   - Enforced step-up authentication for elevated administrative actions.
-
-3. **Audit Logging & Security Operations**:
-   - Immutable security audit event trail recording privileged actions and auth states.
-   - Autonomous security agent health monitoring and query status endpoints.
-   - Centralized SOC Dashboard interface (`/`) for real-time overview.
-
-4. **Rate Limiting & Defense Mechanisms**:
-   - Redis-backed sliding-window rate limiting interceptor.
-   - Hardened HTTP headers middleware (CORS, CSP, XSS-Protection, HSTS).
-   - Input sanitization and payload schema validation via Pydantic v2.
-
-5. **Telemetry & System Health**:
-   - Dedicated health check (`/api/v1/health`) and Prometheus operational metrics (`/api/v1/metrics`).
+- **Framework:** FastAPI 0.115+ running on Uvicorn async ASGI server.
+- **Database & ORM:** SQLAlchemy 2.0+ async engine with Alembic migrations (`aiosqlite` for local/testing, PostgreSQL supported via `asyncpg`).
+- **Caching & State:** Redis backend for rate limiting, session management, and token blacklisting.
+- **Security & Cryptography:** 
+  - Password Hashing: Argon2id (`passlib`)
+  - Token Management: JWT (`python-jose`) with rotation and revocation.
+  - Multi-Factor Authentication: Time-based One-Time Passwords (`pyotp`) with QR code generation.
+  - Defensive Controls: Custom security headers middleware, sliding-window rate limiters, account lockout protection, and input sanitization (`bleach`).
+- **Observability & Testing:** Prometheus metrics instrumentation (`prometheus-fastapi-instrumentator`), structured logging (`structlog`), Pytest, pytest-asyncio, and HTTPX.
 
 ---
 
-## API Endpoints Reference
+## Core Features & Security Implementations
 
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/auth/register` | Register a new operator account | No |
-| `POST` | `/api/v1/auth/login` | Authenticate and obtain JWT access & refresh tokens | No |
-| `POST` | `/api/v1/auth/refresh` | Refresh expired access tokens using rotation | No |
-| `POST` | `/api/v1/auth/logout` | Revoke active session and blacklist JWT | Yes (Bearer) |
-| `GET` | `/api/v1/users/me` | Retrieve authenticated operator profile | Yes (Bearer) |
-| `POST` | `/api/v1/mfa/setup` | Generate TOTP secret & QR configuration | Yes (Bearer) |
-| `POST` | `/api/v1/mfa/verify` | Verify TOTP verification code | Yes (Bearer) |
-| `GET` | `/api/v1/audit/logs` | Retrieve immutable security audit event trail | Yes (Admin Role) |
-| `POST` | `/api/v1/admin/actions` | Execute privileged administrative operations | Yes (Admin Role) |
-| `GET` | `/api/v1/agent/status` | Query autonomous security agent health & status | Yes / Optional |
-| `GET` | `/api/v1/health` | System health check (DB, Redis, Core) | No |
-| `GET` | `/api/v1/metrics` | Prometheus operational telemetry metrics | No |
+1. **Authentication & Token Lifecycle:** Secure registration, login, token refresh rotation, and explicit logout with token blacklisting.
+2. **Multi-Factor Authentication (MFA):** TOTP secret generation, QR code provisioning, and second-factor verification during authentication workflows.
+3. **Role-Based Access Control (RBAC):** Granular permission checks separating regular users from administrative principals.
+4. **Resilience & Protection:** Sliding-window rate limiting to mitigate brute-force and DoS attacks, alongside automated account lockout policies after repeated failed attempts.
+5. **Production Readiness:** Comprehensive health checks (`/health`), Prometheus metrics (`/metrics`), SOC dashboard interface, and strict security response headers.
 
 ---
 
-## Local Development & Setup
+## API Reference / Route Summary
+
+| Endpoint | Method | Description | Auth Requirement |
+| :--- | :---: | :--- | :--- |
+| `/api/v1/auth/register` | `POST` | Register a new user account (Rate limited) | None |
+| `/api/v1/auth/login` | `POST` | Authenticate user & issue JWT tokens (Rate limited) | None |
+| `/api/v1/auth/refresh` | `POST` | Rotate access token using a valid refresh token | Refresh Token |
+| `/api/v1/auth/logout` | `POST` | Revoke/blacklist current session tokens | Bearer Token |
+| `/api/v1/users/me` | `GET` | Retrieve authenticated user profile | Bearer Token |
+| `/api/v1/mfa/setup` | `POST` | Initialize TOTP secret & QR code for MFA | Bearer Token |
+| `/api/v1/mfa/verify` | `POST` | Verify and activate TOTP MFA | Bearer Token |
+| `/api/v1/admin/admin-only` | `POST` | Execute administrative operation | Admin RBAC |
+| `/api/v1/agent/execute` | `POST` | Execute security agent operations | Bearer Token |
+| `/api/v1/audit/logs` | `GET` | Query security audit logs | Bearer Token |
+| `/api/v1/health` | `GET` | System health status check | None |
+| `/api/v1/metrics` | `GET` | Prometheus performance metrics export | None |
+
+---
+
+## Local Setup & Environment Configuration
 
 ### Prerequisites
 - Python 3.13+
-- Redis Server
-- PostgreSQL / Neon Postgres DB URL
+- Poetry (Dependency Management)
+- Redis server (optional for local development/testing fallback)
 
-### Installation Steps
+### Configuration
+Copy `.env.example` to `.env` and configure the required environment variables:
 
-1. **Clone Repository & Setup Environment**:
-   ```bash
-   git clone [https://github.com/hafizabdulaziz/decodelabs-sentinel-auth-vault.git](https://github.com/hafizabdulaziz/decodelabs-sentinel-auth-vault.git)
-   cd decodelabs-sentinel-auth-vault
-   python -m venv .venv
-   
-   # Windows:
-   .venv\Scripts\activate
-   # Linux/macOS:
-   source .venv/bin/activate
-Install Dependencies:
-
-Bash
-pip install poetry
-poetry install
-Environment Configuration:
-Create a .env file in the root directory following .env.example:
-
-Code snippet
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/sentinel_db
+```env
+DATABASE_URL=sqlite+aiosqlite:///./sentinel.db
 REDIS_URL=redis://localhost:6379/0
-SECRET_KEY=your-super-secret-jwt-key
+SECRET_KEY=supersecretkeythatshouldberotated
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=15
 REFRESH_TOKEN_EXPIRE_DAYS=7
-Run Migrations & Launch Application:
+```
 
-Bash
-# Run database migrations
-alembic upgrade head
+### Installation & Execution
 
-# Quick start script (Windows)
-run.bat
+1. Install dependencies:
+   ```bash
+   poetry install
+   ```
 
-# Or launch directly via uvicorn
-uvicorn app.main:app --reload
-Interface Access:
+2. Run database migrations:
+   ```bash
+   poetry run alembic upgrade head
+   ```
 
-SOC Dashboard: http://localhost:8000/
+3. Start the development server (or use `run.bat` on Windows):
+   ```bash
+   poetry run uvicorn app.main:app --reload
+   ```
 
-Interactive API Docs (Swagger UI): http://localhost:8000/docs
+---
 
-Prometheus Metrics: http://localhost:8000/api/v1/metrics
+## Automated Testing & Linting Instructions
 
-Development & Testing
-Automated testing and linting instructions:
+### Running Tests
+Execute the test suite using pytest with asynchronous support:
+```bash
+poetry run pytest
+```
+Or use the provided batch script:
+```cmd
+test.bat
+```
 
-Bash
-# Run test suite
-.venv\Scripts\python -m pytest
-
-# Run code linter
-ruff check .
+### Code Quality & Linting
+Run static analysis and lint checks using Ruff:
+```bash
+poetry run ruff check .
+```
+Or use the lint script:
+```cmd
+lint.bat
+```
