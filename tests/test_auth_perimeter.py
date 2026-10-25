@@ -1,3 +1,4 @@
+from datetime import UTC
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -16,14 +17,14 @@ async def test_read_users_me_unauthenticated():
 @pytest.mark.asyncio
 async def test_read_users_me_authenticated():
     import uuid
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from app.api.deps import get_db
     from app.core.security import create_access_token, get_password_hash
     from app.models.user import User
 
     mock_session = AsyncMock()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     mock_user = User(
         id=uuid.uuid4(),
         email="test@example.com",

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -38,7 +38,7 @@ async def refresh_token(
     # Check if token is revoked in DB
     result = await db.execute(select(RefreshToken).where(RefreshToken.token_hash == token_str))
     token_db = result.scalars().first()
-    if not token_db or token_db.is_revoked or token_db.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
+    if not token_db or token_db.is_revoked or token_db.expires_at < datetime.now(UTC).replace(tzinfo=None):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token expired or revoked",

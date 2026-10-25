@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
@@ -73,7 +73,7 @@ async def login(login_in: LoginRequest, db: AsyncSession = Depends(get_db)):
         refresh_token = create_refresh_token(user.email)
         
         # Store refresh token
-        expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        expires_at = datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
         new_token = RefreshToken(
             user_id=user.id,
             token_hash=refresh_token,

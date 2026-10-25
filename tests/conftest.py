@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -30,7 +30,7 @@ async def db_session():
     mock_session = AsyncMock()
     
     # Create a mock user
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     mock_user = User(
         id=uuid.uuid4(),
         email="test@example.com",

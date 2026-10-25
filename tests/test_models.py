@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 
 from app.models.audit import AuditLog
 from app.models.mfa import MFAModel
@@ -8,7 +8,7 @@ from app.models.user import User
 
 
 def test_user_model():
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     user_id = uuid.uuid4()
     user = User(
         id=user_id,
@@ -35,7 +35,7 @@ def test_mfa_model():
     assert mfa.secret == "secret"
 
 def test_audit_model():
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     audit = AuditLog(
         id=uuid.uuid4(),
         user_id=uuid.uuid4(),
